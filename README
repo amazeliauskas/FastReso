@@ -97,6 +97,15 @@
 # Grid and gsl integration parameters
   grid_params.h
   qag_params.h
-
+===============================================================================
+===============================================================================
+TODO:
+# 1) Currently photons are treated as particles with 1 MeV mass. Thermal
+# spectra is not computed for photons (hard-coded by hand). Also, the
+# degeneracy factor has to be hard-coded.
+#
+# 2) Finite widths of resonances is neglected. If decay process violate formal
+# mass conservation, i.e. Ma < Ma+Mb+(Mc), decay is skipped.
+# 
 
 

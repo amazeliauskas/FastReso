@@ -21,8 +21,8 @@ TParticle::TParticle(std::string name, double mass, double gamma, double spin,
     int pdgcode): fParticleName(name), fMass(mass), fGamma(gamma), fSpin(spin),
   fIsospin(isospin), fI3(i3), fNq(nq), fNs(ns), fNaq(naq), fNas(nas), fNc(nc), fNac(nac),
   fPDGCode(pdgcode) {
-//! Check that mass is and calculated number of spins/polarization
-    if (fMass>0){ fNu = int(2*fSpin+1); } else if (fMass==0) { fNu = int(2*fSpin+1)-1; } else {
+//! Check that mass is and calculated number of spins/polarization (photons are treated as 0.01 MeV particles)
+    if (fMass>0.01){ fNu = int(2*fSpin+1); } else if (fMass==0 or fMass < 0.01) { fNu = int(2*fSpin+1)-1; } else {
       cerr << "\033[1mTParticle.cpp\033[0m : \033[1;31merror\033[0m : Negative mass particle: M="<< fMass  << endl;
       exit(EXIT_FAILURE);
     }

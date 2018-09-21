@@ -489,7 +489,7 @@ void TFastReso::do_2bodydecay(string Father, string Child1, string Child2, doubl
 
     }
   }
-  if (Child1=="pi0139plu"  ) { getParticle(Child1)->print_buffer(Child1+"_"+Father+"_"+Child2);}
+  //if (Child1=="pi0139plu"  ) { getParticle(Child1)->print_buffer(Child1+"_"+Father+"_"+Child2);}
   gsl_integration_workspace_free (fWorkspace2body);
 
 }
@@ -546,7 +546,7 @@ void TFastReso::do_3bodydecay(string Father, string Child1, string Child2,string
   }
 
 
-  if (Child1=="pi0139plu" ) { getParticle(Child1)->print_buffer(Child1+"_"+Father+"_"+Child2+"_"+Child3);}
+  //if (Child1=="pi0139plu" ) { getParticle(Child1)->print_buffer(Child1+"_"+Father+"_"+Child2+"_"+Child3);}
   gsl_integration_workspace_free (fWorkspace2body);
   gsl_integration_workspace_free (fWorkspace3body);
 }
