@@ -1,0 +1,91 @@
+#/*
+# * Copyright (c) 2018 Aleksas Mazeliauskas
+# * All rights reserved.
+# *
+# * FastReso is distributed under MIT license;
+# * see the LICENSE file that should be present in the root
+# * of the source distribution, or alternately available at:
+# * https://github.com/
+# */
+
+# FastReso -- calculates the irreducible spectral components for resonance
+# decays for the given list of particles and decay chains.
+
+# COMPILATION (needed libraries: gsl, cmake and standard c++14):
+  ./cmake
+  ./make
+# RUNING FastReso (by default produces final pi+ decay spectrum components from T=145MeV
+# freeze-out surface)
+  ./run_fastreso.exe
+
+# CONFIGURATION: The main configuration is done by user supplied particle and decay data
+# files. The current readin routines are compatible with the files used 
+# by MC event generators THERMINATOR 2 (arxiv:1102.0273) and SHARE (arxiv:nucl-th/0404083) (but other can be supplied by
+# the user)
+ ./particles.data
+ ./decays.data 
+# Any commented line is skipped (i.e. no particles created or decayed). The
+# decay list should be mass ordered, and, of course all particles appearing
+# in decays should appear in the particles list.
+# Additional configuration (e.g. for the momentum grid) can be done using
+  ./grid_params.h
+  ./qag_params.h
+
+# DESCRIPTION OF EXECUTION:
+# 1) Runing
+  ./run_fastreso.exe
+#will first create class TFastReso, which is responsible for reading-in input
+#files and perfoming the decay calculations.
+
+# 2) TFastReso object must be then invoked with readin method
+  fastreso.read_particle_data("particles.data") 
+# The method reads the resonance list (see particles.data) and creates a list
+# of particles class TParticle, which will contain the irreducible components
+# and the printout proceedures.
+
+# 3) Then irreducible weight fj (or F_j) must be initialized, which depends on
+# the freeze-out parameters (e.g. temperature). Additional functions can be
+# easily added in TFastReso.cpp)
+# Initialization is done by the method do_thermal (which also has optional parameters, e.g.
+# chemical potential. See TFastReso class
+   fastreso.do_thermal(Tfo)
+# Then optionally the initial components can be printed out through
+  fastreso.getParticle("pi0139plu")->print("pi0139plu_thermal");
+
+# 4) The actual decay proceedure is calculated by
+  fastreso.do_decays("decays.data")
+# This methods reads sequentially the decay list and performs the decay
+# incrementing the irreducible components of the decay product. To include
+# all feeddown, decays should be done from the heaviest resonances. After a
+# resonance is decay, its data is locked to prevent modification.
+# If irreducible components are needed for a particular intermediate decay,
+# it can be prinouted out using print_buffer routines (buffer is cleaned after
+# each decay).
+
+# 5) Finally particles, whose final decay components, are needed should be specified
+# in run_fastreso.cpp  (e.g. pions, Kaons, protons). 
+
+# LIST OF FILES:
+# cmake confirugation file
+  CMakeLists.txt
+# the main program file (add final printout calls here)
+  run_fastreso.cpp
+# The main class files (add intermediate printout calls here, add additional
+# delta f's here)
+  TFastReso.cpp
+  TFastReso.h
+# Particle data holder class. Printout routines and momentum grid is defined
+# here.
+  TParticle.cpp
+  TParticle.h
+# Particle and decay data files (from Therminator 2)
+  decays.data
+  particles.data
+# a table of clebsch gordon coefficients to calculated the correct branching
+  CGC.dat
+# Grid and gsl integration parameters
+  grid_params.h
+  qag_params.h
+
+
+
