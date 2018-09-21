@@ -5,19 +5,25 @@
 # * FastReso is distributed under MIT license;
 # * see the LICENSE file that should be present in the root
 # * of the source distribution, or alternately available at:
-# * https://github.com/
+# * https://github.com/amazeliauskas/FastReso/
 # */
 
+
+===============================================================================
 # FastReso -- calculates the irreducible spectral components for resonance
 # decays for the given list of particles and decay chains.
-
+===============================================================================
+===============================================================================
 # COMPILATION (needed libraries: gsl, cmake and standard c++14):
   ./cmake
   ./make
+===============================================================================
+===============================================================================
 # RUNING FastReso (by default produces final pi+ decay spectrum components from T=145MeV
 # freeze-out surface)
   ./run_fastreso.exe
-
+===============================================================================
+===============================================================================
 # CONFIGURATION: The main configuration is done by user supplied particle and decay data
 # files. The current readin routines are compatible with the files used 
 # by MC event generators THERMINATOR 2 (arxiv:1102.0273) and SHARE (arxiv:nucl-th/0404083) (but other can be supplied by
@@ -30,7 +36,8 @@
 # Additional configuration (e.g. for the momentum grid) can be done using
   ./grid_params.h
   ./qag_params.h
-
+===============================================================================
+===============================================================================
 # DESCRIPTION OF EXECUTION:
 # 1) Runing
   ./run_fastreso.exe
@@ -63,8 +70,11 @@
 # each decay).
 
 # 5) Finally particles, whose final decay components, are needed should be specified
-# in run_fastreso.cpp  (e.g. pions, Kaons, protons). 
+# in run_fastreso.cpp  (e.g. pions, Kaons, protons) by their names in
+# particles.data. 
 
+===============================================================================
+===============================================================================
 # LIST OF FILES:
 # cmake confirugation file
   CMakeLists.txt
@@ -78,10 +88,11 @@
 # here.
   TParticle.cpp
   TParticle.h
-# Particle and decay data files (from Therminator 2)
+# Particle and decay data files (from Therminator 2 therminator2.ifj.edu.pl )
   decays.data
   particles.data
-# a table of clebsch gordon coefficients to calculated the correct branching
+# a table of clebsch gordon coefficients to calculate the correct branching
+# ratio
   CGC.dat
 # Grid and gsl integration parameters
   grid_params.h

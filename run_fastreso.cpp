@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2018 Aleksas Mazeliauskas
+ * All rights reserved.
+ *
+ * FastReso is distributed under MIT license;
+ * see the LICENSE file that should be present in the root
+ * of the source distribution, or alternately available at:
+ * https://github.com/amazeliauskas/FastReso/
+ */
+
 #include <iostream>
 #include <TFastReso.h>
 
