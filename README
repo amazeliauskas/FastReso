@@ -19,7 +19,7 @@
   ./make
 ===============================================================================
 ===============================================================================
-# RUNING FastReso (by default produces final pi+ decay spectrum components from T=145MeV
+# RUNING FastReso (by default produces final pi, p, K decay spectrum components from T=145MeV
 # freeze-out surface)
   ./run_fastreso.exe
 ===============================================================================
