@@ -108,7 +108,10 @@ TODO:
 # mass conservation, i.e. Ma < Ma+Mb+(Mc), decay is skipped.
 # 
 # 3) All decays which are not commented out in decays.data are performed,
-# including weak decays. Uncomment unwanted decays manually or add a rule,
+# including weak decays. Comment out unwanted decays manually or add a rule,
 # e.g. min width in TFastReso.cpp.
-
+#
+# 4) Currently only THERMINATOR 2 particle/decay data input files are supported,
+# but adding different input files should be straightforward.
+#
 
