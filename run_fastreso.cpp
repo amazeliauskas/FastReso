@@ -27,12 +27,17 @@ int main()
   fastreso.do_thermal(Tfo);
   cout << " Done Thermal " << endl;
   // print out thermal irreducible functions of some particles
-  fastreso.getParticle("pi0139plu")->print("pi0139plu_thermal");
-  fastreso.getParticle("om0782zer")->print("om0782zer_thermal");
-  fastreso.getParticle("rho770zer")->print("rho770zer_thermal");
+  //fastreso.getParticle("pi0139plu")->print("pi0139plu_thermal");
+  //fastreso.getParticle("om0782zer")->print("om0782zer_thermal");
+  //fastreso.getParticle("rho770zer")->print("rho770zer_thermal");
   // read and do decays (if you want information from partial decay chains, put print
   // out inside the decay loop
   fastreso.do_decays("decays.data");
   // print out final rreducible functions
+  fastreso.getParticle("pr0938plu")->print("pr0938plu_total");
+  fastreso.getParticle("pr0938plb")->print("pr0938plb_total");
+  fastreso.getParticle("Ka0492plu")->print("Ka0492plu_total");
+  fastreso.getParticle("Ka0492min")->print("Ka0492min_total");
   fastreso.getParticle("pi0139plu")->print("pi0139plu_total");
+  fastreso.getParticle("pi0139min")->print("pi0139min_total");
 }

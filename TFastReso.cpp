@@ -340,6 +340,7 @@ void TFastReso::do_decays(string inputname){
       if (count==5)
       {
         double Ma = getParticle(Father)->getM();
+        double GammaA = getParticle(Father)->getGamma();
         double Mb = getParticle(Child1)->getM();
         double Mc = getParticle(Child2)->getM();
         // Skip decays violating mass inequality (only possible by including resonance widths)
@@ -347,6 +348,11 @@ void TFastReso::do_decays(string inputname){
           cerr  << "\033[1mTFastReso.cpp::do_decays\033[0m : \033[1;31merror\033[0m : father particle lighter than childern! " << Ma << " < " << Mb+Mc << endl;
           continue;
         }
+        //// Skip decays whose parents have decay width less than 10KeV 
+        //if (GammaA <  10e-6) {
+        //  cerr  << "\033[1mTFastReso.cpp::do_decays\033[0m : \033[1;31merror\033[0m : father particle width smaller than 10 KeV ! Gamma = " << GammaA << " GeV" << endl;
+        //  continue;
+        //}
         // If ClebschGodranCoeff flag is non-zero, rescaling the branching ratio.
         if (ClebschGordanCoeff){
           double J = getParticle(Father)->getIsospin();

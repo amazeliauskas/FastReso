@@ -27,4 +27,5 @@ set(fastreso_source
 add_library(fastreso ${fastreso_source}) 
 target_link_libraries(fastreso ${GSL_LIBRARIES})
 add_executable(run_fastreso.exe run_fastreso.cpp)
+#add_executable(run_temperature.exe run_temperature.cpp)
 target_link_libraries(run_fastreso.exe fastreso)

@@ -1856,7 +1856,7 @@ eta0prime   om0782zer   gam000zer   0.0303  0
 eta0prime   gam000zer   gam000zer   0.0212  0 
 eta0prime   pi0139plu   pi0139min   eta547zer   0.443    0
 eta0prime   pi0135zer   pi0135zer   eta547zer   0.209    0
-Ka0892plu   pi0139plu   Ka0492zer   1.     1
+Ka0892plu   pi0139plu   Ka0492zer   1.0     1
 Ka0892plu   pi0135zer   Ka0492plu   1.0     1
 Ka0892zer   pi0139min   Ka0492plu   1.0     1
 Ka0892zer   pi0135zer   Ka0492zer   1.0     1
@@ -1875,7 +1875,7 @@ rho770plu   pi0139plu   pi0135zer   1.      1
 rho770min   pi0139min   pi0135zer   1.      1
 f00600zer   pi0135zer   pi0135zer   1.0     1
 f00600zer   pi0139plu   pi0139min   1.0     1
-#eta547zer   gam000zer   gam000zer   0.3943  0
+eta547zer   gam000zer   gam000zer   0.3943  0
 eta547zer   pi0135zer   pi0135zer   pi0135zer   0.3251   0
 eta547zer   pi0139plu   pi0139min   pi0135zer   0.226    0
 eta547zer   pi0139plu   pi0139min   gam000zer   0.0468   0

@@ -107,5 +107,8 @@ TODO:
 # 2) Finite widths of resonances is neglected. If decay process violate formal
 # mass conservation, i.e. Ma < Ma+Mb+(Mc), decay is skipped.
 # 
+# 3) All decays which are not commented out in decays.data are performed,
+# including weak decays. Uncomment unwanted decays manually or add a rule,
+# e.g. min width in TFastReso.cpp.
 
 

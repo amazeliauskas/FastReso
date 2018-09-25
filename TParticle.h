@@ -68,6 +68,7 @@ class TParticle {
     //! return parameters about the particle
     std::string getName() {return fParticleName;};
     double getM() {return fMass;};
+    double getGamma() {return fGamma;};
     double getQB() {return fQB;};
     double getQS() {return fQS;};
     double getQC() {return fQC;};
