@@ -98,6 +98,8 @@
 # Grid and gsl integration parameters
   grid_params.h
   qag_params.h
+# Documentation file
+  note.pdf
 ===============================================================================
 ===============================================================================
 TODO:
