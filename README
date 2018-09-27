@@ -25,7 +25,7 @@
 ===============================================================================
 ===============================================================================
 # CONFIGURATION: The main configuration is done by user supplied particle and decay data
-# files. The current readin routines are compatible with the files used 
+# files. The current read-in routines are compatible with the files used 
 # by MC event generators THERMINATOR 2 (arxiv:1102.0273) and SHARE (arxiv:nucl-th/0404083) (but other can be supplied by
 # the user)
  ./particles.data
@@ -42,9 +42,9 @@
 # 1) Runing
   ./run_fastreso.exe
 #will first create class TFastReso, which is responsible for reading-in input
-#files and perfoming the decay calculations.
+#files and performing the decay calculations.
 
-# 2) TFastReso object must be then invoked with readin method
+# 2) TFastReso object must be then invoked with read-in method
   fastreso.read_particle_data("particles.data") 
 # The method reads the resonance list (see particles.data) and creates a list
 # of particles class TParticle, which will contain the irreducible components
@@ -52,21 +52,22 @@
 
 # 3) Then irreducible weight fj (or F_j) must be initialized, which depends on
 # the freeze-out parameters (e.g. temperature). Additional functions can be
-# easily added in TFastReso.cpp)
+# easily added in TFastReso.cpp). See note.pdf and the paper for
+# documentation.
 # Initialization is done by the method do_thermal (which also has optional parameters, e.g.
 # chemical potential. See TFastReso class
    fastreso.do_thermal(Tfo)
 # Then optionally the initial components can be printed out through
   fastreso.getParticle("pi0139plu")->print("pi0139plu_thermal");
 
-# 4) The actual decay proceedure is calculated by
+# 4) The actual decay procedure is calculated by
   fastreso.do_decays("decays.data")
 # This methods reads sequentially the decay list and performs the decay
 # incrementing the irreducible components of the decay product. To include
-# all feeddown, decays should be done from the heaviest resonances. After a
+# all feed-down, decays should be done from the heaviest resonances. After a
 # resonance is decay, its data is locked to prevent modification.
 # If irreducible components are needed for a particular intermediate decay,
-# it can be prinouted out using print_buffer routines (buffer is cleaned after
+# it can be printed out using print_buffer routines (buffer is cleaned after
 # each decay).
 
 # 5) Finally particles, whose final decay components, are needed should be specified
@@ -91,7 +92,7 @@
 # Particle and decay data files (from Therminator 2 therminator2.ifj.edu.pl )
   decays.data
   particles.data
-# a table of clebsch gordon coefficients to calculate the correct branching
+# a table of Clebsch-Gordan coefficients to calculate the correct branching
 # ratio
   CGC.dat
 # Grid and gsl integration parameters
@@ -101,8 +102,8 @@
 ===============================================================================
 TODO:
 # 1) Currently photons are treated as particles with 1 MeV mass. Thermal
-# spectra is not computed for photons (hard-coded by hand). Also, the
-# degeneracy factor has to be hard-coded.
+# spectra omitted for photons (hard-coded by hand). Also, the
+# degeneracy factor (2 instead of 3) has to be hard-coded.
 #
 # 2) Finite widths of resonances is neglected. If decay process violate formal
 # mass conservation, i.e. Ma < Ma+Mb+(Mc), decay is skipped.
