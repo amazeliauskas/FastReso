@@ -13,6 +13,10 @@
 ===============================================================================
 # FastReso -- calculates the irreducible spectral components for resonance
 # decays for the given list of particles and decay chains.
+#
+# When using FastReso please refer to/cite the accompanying publication 
+# arXiv:1809.11049 "Fast resonance decays in nuclear collisions" 
+# by Aleksas Mazeliauskas, Stefan Floerchinger, Eduardo Grossi, Derek Teaney
 ===============================================================================
 ===============================================================================
 # COMPILATION (needed libraries: gsl, cmake and standard c++14):
