@@ -20,13 +20,13 @@
 ===============================================================================
 ===============================================================================
 # COMPILATION (needed libraries: gsl, cmake and standard c++14):
-  ./cmake
-  ./make
+  cmake ./
+  make
 ===============================================================================
 ===============================================================================
 # RUNING FastReso (by default produces final pi, p, K decay spectrum components from T=145MeV
 # freeze-out surface)
-  ./run_fastreso.exe
+  run_fastreso.exe
 ===============================================================================
 ===============================================================================
 # CONFIGURATION: The main configuration is done by user supplied particle and decay data
