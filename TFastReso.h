@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -10,23 +10,18 @@
  */
 #ifndef FASTRESO_TFastReso_h
 #define FASTRESO_TFastReso_h
-
 #include <fstream>
 #include <memory>
 #include <map>
 #include <vector>
 #include <string>
 #include <gsl/gsl_integration.h>
-
 // The class storing the properties of particles and their irreducible distrubtion
 // function components f_i.  Printing out routines are also defined there.
 #include "TParticle.h"
-
-
 // List of parameters controlling the momentum discretization of irreducible components
 // See also TParticle class definition
 #include "grid_params.h"
-
 //! TFastReso class is the top wrapper class of the fast freeze-out implementation.
 class TFastReso {
   public:
@@ -38,11 +33,9 @@ class TFastReso {
     //!  Name   Mass   Gamma   Sppin  Isospin  I3    Nq    Ns    Naq    Nas    Nc    Nac    PDGCode; 
     //!  Lines starting with '#' are ignored.
     virtual void read_particles_data(std::string inputname, bool verbose=false) = 0;
-
     //! The function call to initialized the particle distribution functions in fParticleData. Input parameters
     //! are the freeze-out temperature, chemical potential and (optionally), speed of sound (only needed for bulk perturbations).
     virtual void do_thermal(double Tfo, double MuB=0, double MuI3=0, double MuS=0, double MuC=0, double Cs2=0.14) = 0;
-
     //! Read in the input file of resonance decays and perfom the decays on the fly. It is important that decays 
     //! are mass ordered to included all feeddown contributions to lower mass resonances.
     //! The table format is the same as decays.data in THERMINATOR 2 	[arXiv:1102.0273]
@@ -56,5 +49,4 @@ class TFastReso {
     //virtual TParticle * getParticle(std::string name);
     //virtual TParticle * getParticle(int i);
 };
-
 #endif

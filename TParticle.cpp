@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -14,22 +14,16 @@
 #include <fstream>
 #include <sstream>
 #include "TParticle.h"
-
 using namespace std;
-
 //! Particle destructor
 TParticle::~TParticle(){
   gsl_interp_accel_free(fPbar_acc);
-
   for (int jj=0; jj<grid_params::fNf; jj++){
   gsl_spline_free(fSpline_Fj[jj]);
   }
   // printf("# \033[1mDelete particle\033[0m : \033[1;32m%s\033[0m ;\tm = %9f GeV;\tnu = %d ;\n", fParticleName.c_str(), fM, fNu);
 }
-
 void TParticle::init_grid(){
-
-
   // Initialize Fj grid
   for (int jj=0; jj<grid_params::fNf; jj++){
   fSpline_Fj[jj] = gsl_spline_alloc(fSpline_type, grid_params::fNpbar);
@@ -45,12 +39,10 @@ void TParticle::init_grid(){
       fFj_arr_buffer[jj][i]= 0.0;
     }
   }
-
   for (int jj=0; jj<grid_params::fNf; jj++){
     fIsModified[jj]=true;
   }
 }
-
 //! Initialize grid interpolators for function Fj
 void TParticle::init(int j){
   gsl_spline_init(fSpline_Fj[j], fPbar_arr, fFj_arr[j], grid_params::fNpbar);
@@ -75,7 +67,6 @@ double TParticle::get_Fj(int j, double Ebar)
   }
   // if pbar above the highest bin, return the logarithmically extrapolated value
   else if (pbar >fPbar_arr[grid_params::fNpbar-1]){
-
     int ip=grid_params::fNpbar-1;
     int im=grid_params::fNpbar-2;
     if (fFj_arr[j][ip]/fFj_arr[j][im]<=1 ) {
@@ -91,18 +82,14 @@ double TParticle::get_Fj(int j, double Ebar)
       std::cerr << "\033[1mTParticle.h\033[0m : \033[1;31merror\033[0m : values increasing " << std::endl;
       exit(EXIT_FAILURE);
     }
-
   } 
   else {
     std::cerr << "\033[1mTParticle.h\033[0m : \033[1;31merror\033[0m : case not found " << std::endl;
     exit(EXIT_FAILURE);
   }
 } 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Printing proceedures
-
 // print Fj to the terminal
 void TParticle::print(){
   printf("# %s\t%9s\n", fDescriptionHeader.c_str(), "Nyield");
@@ -118,8 +105,6 @@ void TParticle::print(){
 }
 // print buffered values of Fj to the terminal (for particular decay chain)
 void TParticle::print_buffer(){
-
-
   printf("# %s\t%9s\n", fDescriptionHeader.c_str(), "Nyield");
   printf("# %s\t%9g\n", fDescription.c_str(), fNtotal_buffer);
   printf("# %s\n", fHeader.c_str());
@@ -147,7 +132,6 @@ void TParticle::print(string tag){
   }
   fclose(pFile);
 }
-
 void TParticle::print_buffer(string tag){
   FILE * pFile;
   string fname = tag+"_Fj.out";
@@ -164,7 +148,3 @@ void TParticle::print_buffer(string tag){
   }
   fclose(pFile);
 }
-
-
-
-

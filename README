@@ -1,5 +1,5 @@
 #/*
-# * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+# * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
 #                      Eduardo Grossi, and Derek Teaney
 # * All rights reserved.
 # *
@@ -28,7 +28,7 @@
 # in the temperature interval T=140-160 MeV in 1 MeV steps). It should take a several minutes on 4-core laptop.
 # using input files from THERMINATOR
   run_fastreso_therminator.exe particles.data decays_without_weak.data ./
-# using input files from AZYHYDRO-like hydro codes, e.g. MUSIC
+# using input files from AZYHYDRO-like hydro codes, e.g. MUSIC or VISHNU
   run_fastreso_azyhydro.exe pdg_weak.data reverse_pdg_weak.data ./
 ===============================================================================
 ===============================================================================
@@ -130,7 +130,8 @@
 
 # Notes:
 # 1)Photons spectra omitted for photons (hard-coded by hand). Also, the
-# degeneracy factor (2 instead of 3) has to be hard-coded.
+# degeneracy factor (2 instead of 3) has to be hard-coded. Note that if mass
+# <=1MeV, particle is treaded as massless.
 #
 # 2) Finite widths of resonances is neglected. If decay process violate formal
 # mass conservation, i.e. Ma < Ma+Mb+(Mc), decay is skipped.
@@ -154,9 +155,10 @@
 ===============================================================================
 # New (2019-07-23):
 # 1) Decays into massless particles, i.e. photon, is now supported through the change of variables
-# in integration variables. 
+# in integration variables. This only affects photon spectra, but is not well
+# tested. See notes.pdf
 # 2) For easier integration the irreducible components were multiplied by powers of mometum. See TFastReso_formulas.h and Notes.pdf
 # 3) Some checks on integration status was introduced, so that error handler could be turn-off if really needed.
-
+# 4) Old version of the code is saved on the branch 1809.11049
 
 

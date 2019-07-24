@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -10,11 +10,9 @@
  */
 #ifndef FASTFO_TParticle_AZYHYDRO_h
 #define FASTFO_TParticle_AZYHYDRO_h
-
 #include "TParticle.h"
 #include <string>
 #include <math.h>
-
 //! Particle class with basic properties and universal decay spectra components
 class TParticle_AZYHYDRO : public TParticle {
   private:
@@ -27,5 +25,4 @@ class TParticle_AZYHYDRO : public TParticle {
     double qb, double qs, double qc, double qbot, double isospin, double charge, int ndecays);
     TParticle_AZYHYDRO(std::string tag);
 };
-
 #endif

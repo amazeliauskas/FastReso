@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -10,7 +10,6 @@
  */
 #ifndef FASTRESO_TFastReso_THERMINATOR_h
 #define FASTRESO_TFastReso_THERMINATOR_h
-
 #include "TFastReso.h"
 #include <fstream>
 #include <memory>
@@ -18,23 +17,18 @@
 #include <vector>
 #include <string>
 #include <gsl/gsl_integration.h>
-
 // The class storing the properties of particles and their irreducible distrubtion
 // function components f_i.  Printing out routines are also defined there.
 #include "TParticle_THERMINATOR.h"
-
-
 // List of parameters controlling the momentum discretization of irreducible components
 // See also TParticle_THERMINATOR class definition
 #include "grid_params.h"
-
 //! TFastReso_THERMINATOR class is the top wrapper class of the fast freeze-out implementation.
 class TFastReso_THERMINATOR: public TFastReso {
   private:
     //! Data vector of TParticle_THERMINATOR class of all read-in particles
     //! See TParticle_THERMINATOR class definition.
     std::vector <std::unique_ptr<TParticle_THERMINATOR>> fParticleData;
-
     //! Map between the particle name and its position in fParticleData vector;
     std::map <std::string, size_t> fIndexTable;
     
@@ -46,12 +40,10 @@ class TFastReso_THERMINATOR: public TFastReso {
     //!  Name   Mass   Gamma   Sppin  Isospin  I3    Nq    Ns    Naq    Nas    Nc    Nac    PDGCode; 
     //!  Lines starting with '#' are ignored.
     void read_particles_data(std::string inputname, bool verbose=false) override;
-
     //! The function call to initialized the particle distribution functions in fParticleData. Input parameters
     //! are the freeze-out temperature, chemical potential and (optionally), speed of sound (only needed for bulk perturbations).
     void do_thermal(double Tfo, double MuB=0, double MuI3=0, double MuS=0, double MuC=0, double Cs2=-1.0) override;
     void do_thermal(int pi, double Tfo, double QMu=0, double Cs2 = -1.0 );
-
     //! Read in the input file of resonance decays and perfom the decays on the fly. It is important that decays 
     //! are mass ordered to included all feeddown contributions to lower mass resonances.
     //! The table format is the same as decays.data in THERMINATOR 2 	[arXiv:1102.0273]

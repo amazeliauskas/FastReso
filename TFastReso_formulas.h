@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ *                    Eduardo Grossi, and Derek Teaney
+ * All rights reserved.
+ *
+ * FastReso is distributed under MIT license;
+ * see the LICENSE file that should be present in the root
+ * of the source distribution, or alternately available at:
+ * https://github.com/amazeliauskas/FastReso/
+ */
 #ifndef FASTRESO_TFastReso_formulas_h
 #define FASTRESO_TFastReso_formulas_h
 #include <gsl/gsl_integration.h>
@@ -198,7 +208,7 @@ double get_F_pu_du(double u, void * p) {
   //double Qw= (Ma*Eabc/Mb/Mb-w*Ma*pabc/Mb/Mb*Ebar/pbar);
   double Qw = Ma/2/pbar*(pbar*pbar/pabc-pabc)+Ma*u;
 //  double Ew= (Ma*Eabc*Ebar/Mb/Mb-w*Ma*pabc*pbar/Mb/Mb);
-  double A = get_factor_Aj(index, Qw, Ebar_old, Ebar, pbar, Ma,sqrt(Qw*Qw+2*u*pabc/pbar));
+  double A = get_factor_Aj(index, Qw, Ebar_old, Ebar, pbar, Ma,sqrt(Qw*Qw+2*u*pabc/pbar*Ma*Ma));
   return F_old*A/(pbar*pabc/Ma/Ma);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -18,7 +18,6 @@ namespace qag_params{
 //  const double fEpsRel = 1e-6;
 //  const double fEpsAbs = 1e-10;
 //  const int fKey = GSL_INTEG_GAUSS51;
-
   const int fLimit = 1000;
 }
 #endif

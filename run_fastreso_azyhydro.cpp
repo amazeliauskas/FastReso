@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -8,24 +8,18 @@
  * of the source distribution, or alternately available at:
  * https://github.com/amazeliauskas/FastReso/
  */
-
 #include <iostream>
 #include <memory>
 #include <string>
 #include <TFastReso_AZYHYDRO.h>
-
 using namespace std ;
-
-
 int main(int argc, const char * argv[])
 {
-
     if (argc<4) {
         cerr << argv[0] << " not enough input arguments " << endl;
         cerr << argv[0] << " particles.data decays.data ./outputfolder/" << endl;
         exit(EXIT_FAILURE) ;
     }
-
     // freeze-out temperature
     string pdata(argv[1]);// = "pdg_weak.dat";
     string ddata(argv[2]);// = "reverse_pdg_weak.dat";
@@ -84,8 +78,6 @@ int main(int argc, const char * argv[])
     double Tmin=0.140;
     double Tmax=0.160;
     double dT=(Tmax-Tmin)/(NT-1);
-
-
 #pragma omp parallel for
     for (int i =0; i <NT; i++){
         double Tfo=Tmin+dT*i; //GeV
@@ -97,13 +89,10 @@ int main(int argc, const char * argv[])
         fastreso.read_particles_data(pdata);
         cout << " Do thermal T = " <<Tfo  <<" GeV" <<endl;
         fastreso.do_thermal(Tfo);
-
         for (int k =0; k<ns; k++){ fastreso.getParticleByPDG(pdg[k])->print(tag+names[k]+"_thermal_T"+Ttag); }
         cout << " Do decays T = " <<Tfo  <<" GeV" <<endl;
         fastreso.do_decays(ddata);
         cout << " Finished decays T = " <<Tfo  <<" GeV" <<endl;
-
         for (int k =0; k<ns; k++){ fastreso.getParticleByPDG(pdg[k])->print(tag+names[k]+"_total_T"+Ttag); }
     }
-
 }

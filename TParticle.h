@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -10,7 +10,6 @@
  */
 #ifndef FASTFO_TParticle_h
 #define FASTFO_TParticle_h
-
 #include <string>
 #include <math.h>
 #include <grid_params.h>
@@ -18,7 +17,6 @@
 #include <gsl/gsl_spline.h>
 //! Enum class for deciding on Bose-Einstein, Fermi-Dirac or Botlzmann particle dsitribution
 enum class EParticleType : int { kBoson = 1, kFermion = -1, kBoltzman = 0 };
-
 //! Particle class with basic properties and universal decay spectra components
 class TParticle {
   protected:
@@ -38,11 +36,9 @@ class TParticle {
     double fQS;     // strange charge
     double fQC;     // charme charge
     EParticleType fParticleType; // particle statistic (bose-einstein, fermi-dirac, boltzmann)
-
     double fTfo;
     double fNtotal; //integrated particle number
     double fNtotal_buffer;
-
     //! Grid and interpolator for decay spectra components
     const gsl_interp_type   *fSpline_type = gsl_interp_cspline;
     double fPbar_arr[grid_params::fNpbar]; // array of fluid restframe momentum
@@ -72,7 +68,6 @@ class TParticle {
     int getNu() {return fNu;};
     int getPDG() {return fPDGCode;};
     EParticleType getType() {return fParticleType;};
-
     //! increment integrated particle number
     void addN(double n) {
             if (fIsLocked){
@@ -92,7 +87,6 @@ class TParticle {
         }   
         fNtotal_buffer=0.0; }
     };
-
    //! return the energy and momentum of grid point i
    double getEbar(int i) {return sqrt(fMass*fMass+getPbar(i)*getPbar(i));};
    double getPbar(int i) {return fPbar_arr[i];};
@@ -100,7 +94,6 @@ class TParticle {
     int getNpbar() {return grid_params::fNpbar;};
     //! Return of the initialization/freeze-out temperature
     double getTfo() {return fTfo;};
-
     //! increment Fj array at cite i by F
     void addFj(int j, int i, double F) { 
       if (fIsLocked){
@@ -112,10 +105,8 @@ class TParticle {
         fIsModified[j]=true;
       }
     };
-
     //! Returns the universal scalar functions Fj at Ebar
     double get_Fj(int j, double Ebar);
-
     //Routines to print the data to screen or file
     std::string getDescriptionHeader(){ return fDescriptionHeader;};
     std::string getDescription(){return fDescription;};
@@ -124,5 +115,4 @@ class TParticle {
     void print_buffer();
     void print_buffer(std::string tag);
 };
-
 #endif

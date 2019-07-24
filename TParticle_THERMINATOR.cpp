@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -13,9 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include "TParticle_THERMINATOR.h"
-
 using namespace std;
-
 //! Class contructor, which takes particle properties and the size of momentum grid
 TParticle_THERMINATOR::TParticle_THERMINATOR(std::string name, double mass, double gamma, double spin,
     double isospin, double i3, double nq, double ns, double naq, double nas, double nc, double nac,
@@ -33,7 +31,6 @@ TParticle_THERMINATOR::TParticle_THERMINATOR(std::string name, double mass, doub
   fNas = nas;
   fNc = nc;
   fNac = nac;
-
   fPDGCode =pdgcode;
   //! Check that mass is and calculated number of spins/polarization (photons are treated as 1 MeV particles)
   if (fMass>0.001){ fNu = int(2*fSpin+1); } else if (fMass==0 or fMass <= 0.001) { fNu = int(2*fSpin+1)-1; } else {
@@ -57,22 +54,15 @@ TParticle_THERMINATOR::TParticle_THERMINATOR(std::string name, double mass, doub
   {
     fParticleType =  EParticleType::kBoltzman; 
   }
-
   // Calculate Baryon, Strangeness and Charm charges
   fQB =round((fNq+fNs+fNc-fNaq-fNas-fNac)/3.0);
   fQS = round(fNas-fNs);
   fQC = round(fNc-fNac);
   // Initialize the integrated yield
   fNtotal=0;
-
-
   
-
   //! Momentum grid initialization
   init_grid();
-
-
-
   // printf("# \033[1mNew particle\033[0m : \033[1;32m%s\033[0m ;\tm = %9f GeV;\tnu = %d ;\n", fParticleName.c_str(), fM, fNu);
   char buffer[500];
   sprintf(buffer,"%9s\t%9s\t%9s\t%5s\t%4s\t%5s\t%s\t%s\t%s\t%s\t%s\t%s\t%9s",
@@ -81,12 +71,9 @@ TParticle_THERMINATOR::TParticle_THERMINATOR(std::string name, double mass, doub
   sprintf(buffer,"%s\t%9f\t%9.5e\t%5.1f\t%5.1f\t%5.1f\t%g\t%g\t%g\t%g\t%g\t%g\t%9d",
       fParticleName.c_str(), fMass, fGamma, fSpin, fIsospin, fI3, fNq, fNs, fNaq, fNas, fNc, fNac, fPDGCode);
   fDescription =  buffer;
-
   
 }
-
 TParticle_THERMINATOR::TParticle_THERMINATOR(string tag){
-
   FILE * pFile;
   string fname = tag+"_Fj.out";
   char buffer[200];
@@ -97,9 +84,7 @@ if( fscanf(pFile, "# %s %lf %le %lf %lf %lf %lg %lg %lg %lg %lg %lg %d %lf\n",
    cerr  << "\033[1mTParticle_THERMINATOR.cpp\033[0m : \033[1;31merror\033[0m :  reading error " << endl;
     exit(EXIT_FAILURE);
 }
-
   fParticleName = buffer;
-
   //! Check that mass is and calculated number of spins/polarization (photons are treated as 0.01 MeV particles)
   if (fMass>0.01){ fNu = int(2*fSpin+1); } else if (fMass==0 or fMass < 0.01) { fNu = int(2*fSpin+1)-1; } else {
     cerr << "\033[1mTParticle_THERMINATOR.cpp\033[0m : \033[1;31merror\033[0m : Negative mass particle: M="<< fMass  << endl;
@@ -122,19 +107,16 @@ if( fscanf(pFile, "# %s %lf %le %lf %lf %lf %lg %lg %lg %lg %lg %lg %d %lf\n",
   {
     fParticleType =  EParticleType::kBoltzman; 
   }
-
   // Calculate Baryon, Strangeness and Charm charges
   fQB =round((fNq+fNs+fNc-fNaq-fNas-fNac)/3.0);
   fQS = round(fNas-fNs);
   fQC = round(fNc-fNac);
-
   //! Momentum grid initialization
   init_grid();
   // Initialize the integrated yield
   fscanf(pFile,"#%*s [GeV]\t%*s [GeV]\t%*s 1\t%*s 2\t%*s 1\t%*s 2\t%*s 3\t%*s 1\t%*s 2\t%*s 1\t%*s 2\t%*s 1\t%*s 2\t%*s 3\n");
   for(int i = 0; i <grid_params::fNpbar; i++){
     if(fscanf(pFile,"%le\t%le", &fPbar_arr[i], &fMass)!=2){
-
     cerr << "\033[1mTParticle_THERMINATOR.cpp\033[0m : \033[1;31merror\033[0m : fscan error"  << endl;
     exit(EXIT_FAILURE);
       }
@@ -149,9 +131,4 @@ if( fscanf(pFile, "# %s %lf %le %lf %lf %lf %lg %lg %lg %lg %lg %lg %d %lf\n",
     fscanf(pFile,"\n");
   }
   fclose(pFile);
-
-
-
 }
-
-
