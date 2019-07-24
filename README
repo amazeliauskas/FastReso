@@ -15,7 +15,7 @@
 # decays for the given list of particles and decay chains.
 #
 # When using FastReso please refer to/cite the accompanying publication 
-# arXiv:1809.11049 "Fast resonance decays in nuclear collisions" 
+# "Fast resonance decays in nuclear collisions"  Eur. Phys. J. C79 (2019) [arXiv:1809.11049]
 # by Aleksas Mazeliauskas, Stefan Floerchinger, Eduardo Grossi, Derek Teaney
 ===============================================================================
 ===============================================================================
@@ -24,17 +24,22 @@
   make
 ===============================================================================
 ===============================================================================
-# RUNING FastReso (by default produces final pi, p, K decay spectrum components from T=145MeV
-# freeze-out surface)
-  run_fastreso.exe
+# RUNING FastReso ( by default will compute ideal components feq1 and feq for pi,K,pi, multi-strange baryons and photons
+# in the temperature interval T=140-160 MeV in 1 MeV steps). It should take a several minutes on 4-core laptop.
+# using input files from THERMINATOR
+  run_fastreso_therminator.exe particles.data decays_without_weak.data ./
+# using input files from AZYHYDRO-like hydro codes, e.g. MUSIC
+  run_fastreso_azyhydro.exe pdg_weak.data reverse_pdg_weak.data ./
 ===============================================================================
 ===============================================================================
 # CONFIGURATION: The main configuration is done by user supplied particle and decay data
 # files. The current read-in routines are compatible with the files used 
-# by MC event generators THERMINATOR 2 (arxiv:1102.0273) and SHARE (arxiv:nucl-th/0404083) (but other can be supplied by
-# the user)
- ./particles.data
+# by MC event generators THERMINATOR 2 (arxiv:1102.0273) and SHARE (arxiv:nucl-th/0404083)
+ ./particles_without_weak.data
  ./decays.data 
+# by hydro codes stemming from AZYHYDRO (arxiv:) and QCD equation of state parametrization  (arxiv:) 
+ ./pdg_weak.data
+ ./reverse_pdg_weak.data
 # Any commented line is skipped (i.e. no particles created or decayed). The
 # decay list should be mass ordered, and, of course all particles appearing
 # in decays should appear in the particles list.
@@ -45,27 +50,31 @@
 ===============================================================================
 # DESCRIPTION OF EXECUTION:
 # 1) Runing
-  ./run_fastreso.exe
-#will first create class TFastReso, which is responsible for reading-in input
+  run_fastreso_therminator.exe particles.data decays_without_weak.data ./
+#will first create derived class TFastReso_THERMINATOR from TFastReso, which is responsible for reading-in input
 #files and performing the decay calculations.
 
 # 2) TFastReso object must be then invoked with read-in method
   fastreso.read_particle_data("particles.data") 
 # The method reads the resonance list (see particles.data) and creates a list
-# of particles class TParticle, which will contain the irreducible components
+# of particles class TParticle_THERMINATOR (derived from TParticle), which will contain the irreducible components
 # and the printout proceedures.
 
 # 3) Then irreducible weight fj (or F_j) must be initialized, which depends on
-# the freeze-out parameters (e.g. temperature). Additional functions can be
-# easily added in TFastReso.cpp). See note.pdf and the paper for
+# the freeze-out parameters (e.g. temperature). 
+# A big change in thisversion of the code is that irreducible components are multiplpied factors of momentum to
+# make calculating integrals easier.
+# Additional functions can be
+# easily added in TFastReso_formulas.h). See note.pdf and the paper for
 # documentation.
+# 
 # Initialization is done by the method do_thermal (which also has optional parameters, e.g.
 # chemical potential. See TFastReso class
    fastreso.do_thermal(Tfo)
 # Then optionally the initial components can be printed out through
   fastreso.getParticle("pi0139plu")->print("pi0139plu_thermal");
 
-# 4) The actual decay procedure is calculated by
+# 4) The actual decay procedure is calculated by (see TFastReso_formulas.h)
   fastreso.do_decays("decays.data")
 # This methods reads sequentially the decay list and performs the decay
 # incrementing the irreducible components of the decay product. To include
@@ -76,8 +85,12 @@
 # each decay).
 
 # 5) Finally particles, whose final decay components, are needed should be specified
-# in run_fastreso.cpp  (e.g. pions, Kaons, protons) by their names in
+# in run_fastreso_therminator.cpp  (e.g. pions, Kaons, protons) by their names in
 # particles.data. 
+
+# Analogous routine applies to other forms of import, e.g. AZYHYDRO. For custom imput files, it is easiest
+# to create new derivative classes of TFastReso and TParticles. The decay procedure only needs
+# few of available information, e.g. masses and branching ratios, but in the future decay width could be used.
 
 ===============================================================================
 ===============================================================================
@@ -85,20 +98,27 @@
 # cmake confirugation file
   CMakeLists.txt
 # the main program file (add final printout calls here)
-  run_fastreso.cpp
+  run_fastreso_therminator.cpp
+  run_fastreso_azyhydro.cpp
 # The main class files (add intermediate printout calls here, add additional
 # delta f's here)
-  TFastReso.cpp
   TFastReso.h
+  TFastReso_formulas.h
+  TFastReso_THERMINATOR.h .cpp
+  TFastReso_AZYHYDRO.h .cpp
 # Particle data holder class. Printout routines and momentum grid is defined
 # here.
   TParticle.cpp
   TParticle.h
-# Particle and decay data files (from Therminator 2 therminator2.ifj.edu.pl )
+  TParticle_THERMINATOR.h .cpp
+  TParticle_AZYHYDRO.h .cpp
+# Particle and decay data files 
   decays.data
   particles.data
+  pdg_weak.data
+  reverse_pdg_weak.data
 # a table of Clebsch-Gordan coefficients to calculate the correct branching
-# ratio
+# ratio (needed for THERMINATOR type input)
   CGC.dat
 # Grid and gsl integration parameters
   grid_params.h
@@ -107,9 +127,9 @@
   note.pdf
 ===============================================================================
 ===============================================================================
-TODO:
-# 1) Currently photons are treated as particles with 1 MeV mass. Thermal
-# spectra omitted for photons (hard-coded by hand). Also, the
+
+# Notes:
+# 1)Photons spectra omitted for photons (hard-coded by hand). Also, the
 # degeneracy factor (2 instead of 3) has to be hard-coded.
 #
 # 2) Finite widths of resonances is neglected. If decay process violate formal
@@ -117,9 +137,26 @@ TODO:
 # 
 # 3) All decays which are not commented out in decays.data are performed,
 # including weak decays. Comment out unwanted decays manually or add a rule,
-# e.g. min width in TFastReso.cpp.
+# e.g. min width in TFastReso_THERMINATOR.cpp.
 #
-# 4) Currently only THERMINATOR 2 particle/decay data input files are supported,
-# but adding different input files should be straightforward.
+# 4) For production results we typically use the following grid and integration parameters (which might
+# take longer on a simple laptop, but is not a problem on a single ~16 core machine)
+  static const int fNpbar = 201; // number of points fluid restfram pbar grid
+  static const double fPbarMax = 5.5; //  the max pbar value
+  const double fEpsRel = 1e-6;
+  const double fEpsAbs = 1e-10;
+  const int fKey = GSL_INTEG_GAUSS51;
+# 5) To initialize bulk perturbations the user needs to provide (temperature
+# dependent) speed of sound cs2(T)
 #
+#
+===============================================================================
+===============================================================================
+# New (2019-07-23):
+# 1) Decays into massless particles, i.e. photon, is now supported through the change of variables
+# in integration variables. 
+# 2) For easier integration the irreducible components were multiplied by powers of mometum. See TFastReso_formulas.h and Notes.pdf
+# 3) Some checks on integration status was introduced, so that error handler could be turn-off if really needed.
+
+
 

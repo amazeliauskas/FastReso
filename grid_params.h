@@ -20,7 +20,8 @@
 ////      }
 
 namespace grid_params{
-  static const int fNf = 12; //  number of f_i functions to computer
+//  static const int fNf = 12; //  number of f_i functions to computer
+  static const int fNf = 2; //  number of f_i functions to computeri, max number 12
   static const int fNpbar = 201; // number of points fluid restfram pbar grid
   static const double fPbarMax = 5.5; //  the max pbar value
   static const double fMref = 1.0; //  [GeV] momentum scale for tan discretization.

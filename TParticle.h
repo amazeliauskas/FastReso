@@ -21,20 +21,17 @@ enum class EParticleType : int { kBoson = 1, kFermion = -1, kBoltzman = 0 };
 
 //! Particle class with basic properties and universal decay spectra components
 class TParticle {
-  private:
+  protected:
     //! Particle properties
     std::string fParticleName;  // particle name
+    std::string fDescription;  // particle name
+    std::string fDescriptionHeader;  // particle name
+    std::string fHeader = "1:pbar [GeV]\t2:m [GeV]\t3:pbar*feq_1\t4:pbar*feq_2\t5:pbar^3*fshear_1\t6:pbar^3*fshear_2\t7:pbar^3*fshear_3\t8:pbar*fbulk_1\t9:pbar*fbulk_2\t10:pbar*ftemperature_1\t11:pbar*ftemperature_2\t12:pbar^2*fvelocity 1\t13:pbar^2*fvelocity_2\t14:pbar^2*fvelocity_3";
+      
+        // particle name
     double fMass;   // [GeV] resonance mass
     double fGamma;  // [GeV] resonance width (currently not used)
-    double fSpin;   // spin
     double fIsospin; // isospin J |J,m>
-    double fI3;     // isospin projection m: |J,m>
-    double fNq;     // number of up or down quarks
-    double fNs;     // number of strange quarks
-    double fNaq;    // number of up or down antiquarks
-    double fNas;    // number of strange antiquarks
-    double fNc;     // number of charm quarks
-    double fNac;    // number of charm antiquarks
     int fPDGCode;   // number code according to PDG
     int fNu;        // degeneracy of a particle
     double fQB;     // baryon charge
@@ -51,20 +48,17 @@ class TParticle {
     double fPbar_arr[grid_params::fNpbar]; // array of fluid restframe momentum
     double fFj_arr[grid_params::fNf][grid_params::fNpbar]; // array of scalar functions Fj
     double fFj_arr_buffer[grid_params::fNf][grid_params::fNpbar]; // buffer array of scalar functions Fj 
-    gsl_spline *fSpline_Fj ;
+    gsl_spline *fSpline_Fj[grid_params::fNf] ;
     gsl_interp_accel *fPbar_acc;
     //! Bool variables to control data read in/out-put
     bool fIsLocked = false; //if true, prevent modifying fFj_arr data
     bool fIsModified[grid_params::fNf]; //if true, require initilization of interpolator
-    bool fIsLoaded[grid_params::fNf] ; //if false, load new data to interpolator
     //! After any update of the grid, don't forget to reinitialized the interpolator!
     //! initiliazes the interpolator
+    void init_grid();
     void init(int j);
   public:
     //! Contructor with particle properties
-    TParticle(std::string name, double mass, double gamma, double spin,
-    double isospin, double i3, double nq, double ns, double naq, double nas, double nc, double nac,
-    int pdgcode);
     ~TParticle() ;
     //! return parameters about the particle
     std::string getName() {return fParticleName;};
@@ -73,11 +67,10 @@ class TParticle {
     double getQB() {return fQB;};
     double getQS() {return fQS;};
     double getQC() {return fQC;};
-    double getI3() {return fI3;};
     double getIsospin() {return fIsospin;};
-    double getSpin() {return fSpin;};
     double getN() {return fNtotal;};
     int getNu() {return fNu;};
+    int getPDG() {return fPDGCode;};
     EParticleType getType() {return fParticleType;};
 
     //! increment integrated particle number
@@ -90,6 +83,7 @@ class TParticle {
     void setTfo(double Tfo) {fTfo=Tfo;};
     //! set lock on data modification
     void lock() {fIsLocked=true;};
+    bool hasdecayed() {return fIsLocked;};
     //! clean the buffer
     void clean_buffer() { 
       for(int i = 0; i <grid_params::fNpbar; i++){
@@ -123,6 +117,8 @@ class TParticle {
     double get_Fj(int j, double Ebar);
 
     //Routines to print the data to screen or file
+    std::string getDescriptionHeader(){ return fDescriptionHeader;};
+    std::string getDescription(){return fDescription;};
     void print();
     void print(std::string tag);
     void print_buffer();

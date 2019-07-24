@@ -14,7 +14,11 @@
 namespace qag_params{
   const double fEpsRel = 1e-6;
   const double fEpsAbs = 1e-6;
-  const int fKey = GSL_INTEG_GAUSS51;
+  const int fKey = GSL_INTEG_GAUSS21;
+//  const double fEpsRel = 1e-6;
+//  const double fEpsAbs = 1e-10;
+//  const int fKey = GSL_INTEG_GAUSS51;
+
   const int fLimit = 1000;
 }
 #endif
