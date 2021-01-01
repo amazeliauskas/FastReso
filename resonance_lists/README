@@ -1,0 +1,45 @@
+# Resonance lists are NOT part of FastReso publication. Please cite the
+original authors, who composed the lists
+
+
+# The following files
+decays_PDG2005_massorder.dat
+decays_PDG2016_massorder.dat
+decays_PDG2016Plus_massorder.dat
+decays_QM2016Plus_massorder.dat
+# contain particle and decay information in AZYHYDRO format. Use
+# run_fastreso_azyhydro.exe to perform decays with these files.
+
+# Resonance lists are NOT part of FastReso publication. Please cite the
+original authors, who composed the lists
+Originally written by Paolo Parotto, University of Wuppertal, 
+Department of Physics, Wuppertal D-42119, Germany. 
+  When using these lists, please refer to the following works:
+  - Phys.Rev. D96 (2017) no.3, 034517 (https://inspirehep.net/record/1512119)
+  - Phys.Rev. C98 (2018) no.3, 034909 (https://inspirehep.net/record/1636208)
+  - Phys.Rev. C101 (2020) no.5, 054905 (https://inspirehep.net/literature/1782970)
+
+# These public resonance lists were retrieved from
+http://nsmn1.uh.edu/cratti/decays.html
+http://nsmn1.uh.edu/cratti/decays_files/hadron_lists_Sep2020.tar.gz
+
+
+# The following lists
+particles.data
+decays.data
+decays_without_weak.data
+# contain particle and decay information in THERMINATOR format. Use
+# run_fastreso_therminator.exe to perform decays with these files.
+
+
+# Resonance lists are NOT part of FastReso publication. Please cite the
+original authors, who composed the lists
+Mikolaj Chojnacki, Adam Kisiel, Wojciech Florkowski, Wojciech Broniowski , Comput.Phys.Commun. 183 (2012) 746-773, arXiv:1102.0273
+Giorgio Torrieri, Steve Steinke, Wojciech Broniowski, Wojciech Florkowski
+Jean Letessier, Johann Rafelski, , Comput.Phys.Commun.167:229-251,2005, arXiv:nucl-th/0404083
+# These public resonance lists were retrieved from
+https://therminator2.ifj.edu.pl/
+https://therminator2.ifj.edu.pl/file_content_particles_data.html
+https://therminator2.ifj.edu.pl/file_content_decays_data.html
+
+

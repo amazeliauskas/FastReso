@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2018-2021 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -15,15 +15,49 @@
 #include <sstream>
 #include "TParticle.h"
 using namespace std;
+
 //! Particle destructor
 TParticle::~TParticle(){
   gsl_interp_accel_free(fPbar_acc);
+
   for (int jj=0; jj<grid_params::fNf; jj++){
   gsl_spline_free(fSpline_Fj[jj]);
   }
-  // printf("# \033[1mDelete particle\033[0m : \033[1;32m%s\033[0m ;\tm = %9f GeV;\tnu = %d ;\n", fParticleName.c_str(), fM, fNu);
+//   printf("# \033[1mDelete particle\033[0m : \033[1;32m%s\033[0m ;\tm = %9f GeV;\tnu = %d ;\n", fParticleName.c_str(), fMass, fNu);
 }
-void TParticle::init_grid(){
+
+void TParticle::init_grid(string comps){
+  stringstream sstr(comps);
+  string col;
+  while (getline(sstr, col, ' ')){
+    if (col=="Feq")         { 
+      
+fComponents.push_back(EFjIndex::kFeq1);
+fComponents.push_back(EFjIndex::kFeq2);
+      }
+    else if (col=="Fshear") { 
+    
+fComponents.push_back(EFjIndex::kFshear1);
+fComponents.push_back(EFjIndex::kFshear2);
+fComponents.push_back(EFjIndex::kFshear3);
+    
+    }
+    else if (col=="Fbulk")  { 
+fComponents.push_back(EFjIndex::kFbulk1);
+fComponents.push_back(EFjIndex::kFbulk2);
+    }
+    else if (col=="Ftemp")  {
+fComponents.push_back(EFjIndex::kFtemp1);
+fComponents.push_back(EFjIndex::kFtemp2);
+    }
+    else if (col=="Fvel")   {
+fComponents.push_back(EFjIndex::kFvel1);
+fComponents.push_back(EFjIndex::kFvel2);
+fComponents.push_back(EFjIndex::kFvel3);
+    }
+    else { std::cerr << "\033[1mTFastReso.cpp\033[0m : \033[1;31mwarning\033[0m : unkwnown label " << col  <<std::endl; }
+  }
+
   // Initialize Fj grid
   for (int jj=0; jj<grid_params::fNf; jj++){
   fSpline_Fj[jj] = gsl_spline_alloc(fSpline_type, grid_params::fNpbar);
@@ -39,10 +73,12 @@ void TParticle::init_grid(){
       fFj_arr_buffer[jj][i]= 0.0;
     }
   }
+
   for (int jj=0; jj<grid_params::fNf; jj++){
     fIsModified[jj]=true;
   }
 }
+
 //! Initialize grid interpolators for function Fj
 void TParticle::init(int j){
   gsl_spline_init(fSpline_Fj[j], fPbar_arr, fFj_arr[j], grid_params::fNpbar);
@@ -67,6 +103,7 @@ double TParticle::get_Fj(int j, double Ebar)
   }
   // if pbar above the highest bin, return the logarithmically extrapolated value
   else if (pbar >fPbar_arr[grid_params::fNpbar-1]){
+
     int ip=grid_params::fNpbar-1;
     int im=grid_params::fNpbar-2;
     if (fFj_arr[j][ip]/fFj_arr[j][im]<=1 ) {
@@ -82,14 +119,21 @@ double TParticle::get_Fj(int j, double Ebar)
       std::cerr << "\033[1mTParticle.h\033[0m : \033[1;31merror\033[0m : values increasing " << std::endl;
       exit(EXIT_FAILURE);
     }
+
   } 
   else {
     std::cerr << "\033[1mTParticle.h\033[0m : \033[1;31merror\033[0m : case not found " << std::endl;
+
     exit(EXIT_FAILURE);
   }
+    exit(EXIT_FAILURE);
+    return 0;
 } 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Printing proceedures
+
 // print Fj to the terminal
 void TParticle::print(){
   printf("# %s\t%9s\n", fDescriptionHeader.c_str(), "Nyield");
@@ -105,6 +149,8 @@ void TParticle::print(){
 }
 // print buffered values of Fj to the terminal (for particular decay chain)
 void TParticle::print_buffer(){
+
+
   printf("# %s\t%9s\n", fDescriptionHeader.c_str(), "Nyield");
   printf("# %s\t%9g\n", fDescription.c_str(), fNtotal_buffer);
   printf("# %s\n", fHeader.c_str());
@@ -122,16 +168,24 @@ void TParticle::print(string tag){
   pFile = fopen (fname.c_str(),"w");
   fprintf(pFile,"# %s\t%9s\n", fDescriptionHeader.c_str(), "Nyield");
   fprintf(pFile,"# %s\t%9g\n", fDescription.c_str(), fNtotal);
-  fprintf(pFile,"# %s\n", fHeader.c_str());
+  fprintf(pFile,"# %s", fHeader.c_str());
+  int inx = 3;
+  for(auto j: fComponents) {
+    fprintf(pFile,"\t%d:%s",inx, fComponentNames[(int) j].c_str());
+    inx++;
+  }
+  fprintf(pFile,"\n");
   for(int i = 0; i <grid_params::fNpbar; i++){
     fprintf(pFile,"%15.5e\t%15.5e", fPbar_arr[i], fMass);
-    for(int j = 0; j <grid_params::fNf; j++){
-      fprintf(pFile,"\t%15.5e", fFj_arr[j][i]);
+    //for(int j = 0; j <grid_params::fNf; j++){
+    for(auto j: fComponents) {
+      fprintf(pFile,"\t%15.5e", fFj_arr[ (int)j][i]);
     }
     fprintf(pFile,"\n");
   }
   fclose(pFile);
 }
+
 void TParticle::print_buffer(string tag){
   FILE * pFile;
   string fname = tag+"_Fj.out";
@@ -141,10 +195,15 @@ void TParticle::print_buffer(string tag){
   fprintf(pFile,"# %s\n", fHeader.c_str());
   for(int i = 0; i <grid_params::fNpbar; i++){
     fprintf(pFile,"%15.5e\t%15.5e", fPbar_arr[i], fMass);
-    for(int j = 0; j <grid_params::fNf; j++){
-      fprintf(pFile,"\t%15.5e", fFj_arr_buffer[j][i]);
+    //for(int j = 0; j <grid_params::fNf; j++){
+    for(auto j: fComponents) {
+      fprintf(pFile,"\t%15.5e", fFj_arr_buffer[ (int) j][i]);
     }
     fprintf(pFile,"\n");
   }
   fclose(pFile);
 }
+
+
+
+

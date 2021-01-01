@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2018-2021 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -10,13 +10,35 @@
  */
 #ifndef FASTFO_TParticle_h
 #define FASTFO_TParticle_h
+
 #include <string>
+#include <vector>
 #include <math.h>
+
+#include <vector>
+#include <string>
+#include <iostream>
 #include <grid_params.h>
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 //! Enum class for deciding on Bose-Einstein, Fermi-Dirac or Botlzmann particle dsitribution
 enum class EParticleType : int { kBoson = 1, kFermion = -1, kBoltzman = 0 };
+enum class EFjIndex : int { 
+  kFeq1 = 0,
+  kFeq2 = 1,
+  kFshear1 = 2,
+  kFshear2 = 3,
+  kFshear3 = 4,
+  kFbulk1  = 5,
+  kFbulk2  = 6,
+  kFtemp1  = 7,
+  kFtemp2  = 8,
+  kFvel1  = 9,
+  kFvel2  = 10,
+  kFvel3  = 11 };
+
+
+
 //! Particle class with basic properties and universal decay spectra components
 class TParticle {
   protected:
@@ -24,7 +46,9 @@ class TParticle {
     std::string fParticleName;  // particle name
     std::string fDescription;  // particle name
     std::string fDescriptionHeader;  // particle name
-    std::string fHeader = "1:pbar [GeV]\t2:m [GeV]\t3:pbar*feq_1\t4:pbar*feq_2\t5:pbar^3*fshear_1\t6:pbar^3*fshear_2\t7:pbar^3*fshear_3\t8:pbar*fbulk_1\t9:pbar*fbulk_2\t10:pbar*ftemperature_1\t11:pbar*ftemperature_2\t12:pbar^2*fvelocity 1\t13:pbar^2*fvelocity_2\t14:pbar^2*fvelocity_3";
+    std::string fHeader = "1:pbar [GeV]\t2:m [GeV]";
+    std::vector<std::string> fComponentNames = {"Feq 1", "Feq 2","Fshear 1","Fshear 2","Fshear 3","Fbulk 1","Fbulk 2","Ftemp 1","Ftemp 2","Fvel 1","Fvel 2","Fvel 3"};
+    //std::string fHeader = "1:pbar [GeV]\t2:m [GeV]\t3:feq 1\t4:feq 2\t5:fshear 1\t6:fshear 2\t7:fshear 3\t8:fbulk 1\t9:fbulk 2\t10:ftemperature 1\t11:ftemperature 2\t12:fvelocity 1\t13:fvelocity 2\t14:fvelocity 3";
       
         // particle name
     double fMass;   // [GeV] resonance mass
@@ -36,9 +60,11 @@ class TParticle {
     double fQS;     // strange charge
     double fQC;     // charme charge
     EParticleType fParticleType; // particle statistic (bose-einstein, fermi-dirac, boltzmann)
+
     double fTfo;
     double fNtotal; //integrated particle number
     double fNtotal_buffer;
+
     //! Grid and interpolator for decay spectra components
     const gsl_interp_type   *fSpline_type = gsl_interp_cspline;
     double fPbar_arr[grid_params::fNpbar]; // array of fluid restframe momentum
@@ -51,9 +77,11 @@ class TParticle {
     bool fIsModified[grid_params::fNf]; //if true, require initilization of interpolator
     //! After any update of the grid, don't forget to reinitialized the interpolator!
     //! initiliazes the interpolator
-    void init_grid();
+    void init_grid(std::string comps="Feq Fshear Fbulk Ftemp Fvel");
     void init(int j);
   public:
+
+    std::vector <EFjIndex> fComponents;
     //! Contructor with particle properties
     ~TParticle() ;
     //! return parameters about the particle
@@ -68,6 +96,7 @@ class TParticle {
     int getNu() {return fNu;};
     int getPDG() {return fPDGCode;};
     EParticleType getType() {return fParticleType;};
+
     //! increment integrated particle number
     void addN(double n) {
             if (fIsLocked){
@@ -87,6 +116,7 @@ class TParticle {
         }   
         fNtotal_buffer=0.0; }
     };
+
    //! return the energy and momentum of grid point i
    double getEbar(int i) {return sqrt(fMass*fMass+getPbar(i)*getPbar(i));};
    double getPbar(int i) {return fPbar_arr[i];};
@@ -94,6 +124,7 @@ class TParticle {
     int getNpbar() {return grid_params::fNpbar;};
     //! Return of the initialization/freeze-out temperature
     double getTfo() {return fTfo;};
+
     //! increment Fj array at cite i by F
     void addFj(int j, int i, double F) { 
       if (fIsLocked){
@@ -105,8 +136,10 @@ class TParticle {
         fIsModified[j]=true;
       }
     };
+
     //! Returns the universal scalar functions Fj at Ebar
     double get_Fj(int j, double Ebar);
+
     //Routines to print the data to screen or file
     std::string getDescriptionHeader(){ return fDescriptionHeader;};
     std::string getDescription(){return fDescription;};
@@ -115,4 +148,5 @@ class TParticle {
     void print_buffer();
     void print_buffer(std::string tag);
 };
+
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
+ * Copyright (c) 2018-2021 Aleksas Mazeliauskas, Stefan Floerchinger, 
  *                    Eduardo Grossi, and Derek Teaney
  * All rights reserved.
  *
@@ -12,87 +12,79 @@
 #include <memory>
 #include <string>
 #include <TFastReso_AZYHYDRO.h>
+#include <gsl/gsl_errno.h>
 using namespace std ;
 int main(int argc, const char * argv[])
 {
-    if (argc<4) {
+    if (argc<3) {
         cerr << argv[0] << " not enough input arguments " << endl;
-        cerr << argv[0] << " particles.data decays.data ./outputfolder/" << endl;
+        cerr << argv[0] << " decays_PDG2016_massordered.dat ./outputfolder/" << endl;
         exit(EXIT_FAILURE) ;
     }
+/////////////////// DANGER ///////////////////////////////////////////////////
+  // If integration fails, you can turn the handler off. Integration functions
+  // in TFastReso_THERMINATOR.cpp and TFastReso_formulas.h will try reducing accuracy
+  // for the failing cases.  Use with caution!
+  gsl_set_error_handler_off ();
+/////////////////// DANGER ///////////////////////////////////////////////////
+
+
+
     // freeze-out temperature
-    string pdata(argv[1]);// = "pdg_weak.dat";
-    string ddata(argv[2]);// = "reverse_pdg_weak.dat";
-    string tag(argv[3]);
-    const int ns=22;
-    const string names[ns]={
-        "gam000zer",
-        "pi0135zer",
-        "pi0139plu",
-        "pi0139min",
-        "Ka0492plu",
-        "Ka0492min",
-        "Ka0492zer",
-        "Ka0492zrb",
-        "pr0938plu", 
-        "pr0938plb", 
-        "Lm1115zer",
-        "Lm1115zrb",
-        "Sg1189plu",
-        "Sg1189plb",
-        "Sg1189min",
-        "Sg1189mnb",
-        "Xi1321zer",
-        "Xi1321zrb",
-        "Xi1321min",
-        "Xi1321mnb",
-        "UM1672min",
-        "UM1672mnb"
-    };
+    string pdata(argv[1]);// = "decays_PDG2016_massordered.dat";
+    string ddata(argv[1]);// = "decays_PDG2016_massordered.dat";
+    string tag(argv[2]);
+    bool verbose = true ; // print what is being done
+    const int ns=6;
+    // which particles to print out
     const int pdg[ns]={
-        22,
-        111,
         211,
-        -211,
         321,
-        -321,
-        311,
-        -311,
         2212,
-        -2212,
         3122,
-        -3122,
-        3222,
-        -3222,
-        3112,
-        -3112,
-        3322,
-        -3322,
         3312,
-        -3312,
-        3334,
-        -3334
+        3334
     };
+
     // freeze-out temperature
-    const int NT = 21;
-    double Tmin=0.140;
-    double Tmax=0.160;
-    double dT=(Tmax-Tmin)/(NT-1);
-#pragma omp parallel for
-    for (int i =0; i <NT; i++){
-        double Tfo=Tmin+dT*i; //GeV
+//    const int NT = 6; // number of temperatures
+//    double Tmin=0.120; // min temp
+//    double Tmax=0.170; // max temp
+//    double dT=(Tmax-Tmin)/(NT-1); // temp step
+//#pragma omp parallel for
+//    for (int i =0; i <NT; i++){
+    {
+//        double Tfo=Tmin+dT*i; //GeV
+        double Tfo=0.145; //GeV freeze-out temperature
         char buffer [50];
         sprintf (buffer, "%.4f", Tfo);
         string Ttag(buffer);
+        string inarg= "Feq Fshear Fbulk Ftemp Fvel"; // which components to print out
+        
+        // create the TFastReso class
         TFastReso_AZYHYDRO fastreso;
         // read all particles
-        fastreso.read_particles_data(pdata);
+        fastreso.read_particles_data(pdata,inarg, verbose);
+
+        // initialize components with thermal distributions at freeze-out temperature
         cout << " Do thermal T = " <<Tfo  <<" GeV" <<endl;
         fastreso.do_thermal(Tfo);
-        for (int k =0; k<ns; k++){ fastreso.getParticleByPDG(pdg[k])->print(tag+names[k]+"_thermal_T"+Ttag); }
+
+        // print out particles
+        for (int k =0; k<ns; k++){ 
+        sprintf (buffer, "PDGid_%d", pdg[k]);
+        string name(buffer);
+          fastreso.getParticleByPDG(pdg[k])->print(tag+name+"_thermal_T"+Ttag); }
+
+
+        // perform decays
         cout << " Do decays T = " <<Tfo  <<" GeV" <<endl;
-        fastreso.do_decays(ddata);
-        cout << " Finished decays T = " <<Tfo  <<" GeV" <<endl;
-        for (int k =0; k<ns; k++){ fastreso.getParticleByPDG(pdg[k])->print(tag+names[k]+"_total_T"+Ttag); }
+        fastreso.do_decays(ddata, verbose);
+
+        // print out components
+        for (int k =0; k<ns; k++){ 
+        sprintf (buffer, "PDGid_%d", pdg[k]);
+        string name(buffer);
+          fastreso.getParticleByPDG(pdg[k])->print(tag+name+"_total_T"+Ttag); }
     }
 }

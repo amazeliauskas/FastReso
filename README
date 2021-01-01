@@ -1,5 +1,5 @@
 #/*
-# * Copyright (c) 2019 Aleksas Mazeliauskas, Stefan Floerchinger, 
+# * Copyright (c) 2018-2021 Aleksas Mazeliauskas, Stefan Floerchinger, 
 #                      Eduardo Grossi, and Derek Teaney
 # * All rights reserved.
 # *
@@ -19,27 +19,36 @@
 # by Aleksas Mazeliauskas, Stefan Floerchinger, Eduardo Grossi, Derek Teaney
 ===============================================================================
 ===============================================================================
-# COMPILATION (needed libraries: gsl, cmake and standard c++14):
+# COMPILATION (needed libraries: gsl, cmake and standard c++17):
   cmake ./
   make
 ===============================================================================
 ===============================================================================
-# RUNING FastReso ( by default will compute ideal components feq1 and feq for pi,K,pi, multi-strange baryons and photons
-# in the temperature interval T=140-160 MeV in 1 MeV steps). It should take a several minutes on 4-core laptop.
+# RUNING FastReso ( by default will compute irreducible for pi,K,p, and
+#  multi-strange baryons (Xsi, Lambda and Omega)
+# for the freeze-out temperature T=145 MeV). It should take several minutes
+# (longer for bigger resonance lists).
 # using input files from THERMINATOR
   run_fastreso_therminator.exe particles.data decays_without_weak.data ./
 # using input files from AZYHYDRO-like hydro codes, e.g. MUSIC or VISHNU
-  run_fastreso_azyhydro.exe pdg_weak.data reverse_pdg_weak.data ./
+  run_fastreso_azyhydro.exe decays_PDG2016Plus_massorder.dat ./
 ===============================================================================
 ===============================================================================
 # CONFIGURATION: The main configuration is done by user supplied particle and decay data
 # files. The current read-in routines are compatible with the files used 
 # by MC event generators THERMINATOR 2 (arxiv:1102.0273) and SHARE (arxiv:nucl-th/0404083)
- ./particles_without_weak.data
- ./decays.data 
-# by hydro codes stemming from AZYHYDRO (arxiv:) and QCD equation of state parametrization  (arxiv:) 
- ./pdg_weak.data
- ./reverse_pdg_weak.data
+ ./resonance_lists/particles.data
+ ./resonance_lists/decays_without_weak.data 
+ ./resonance_lists/decays.data 
+# by hydro codes stemming from AZYHYDRO (recently composed by Paolo Parotto)
+ ./resonance_lists/decays_PDG2005_massorder.dat
+ ./resonance_lists/decays_PDG2016_massorder.dat
+ ./resonance_lists/decays_PDG2016Plus_massorder.dat
+ ./resonance_lists/decays_QM2016Plus_massorder.dat
+  When using these lists, please refer to the following works:
+  - Phys.Rev. D96 (2017) no.3, 034517 (https://inspirehep.net/record/1512119)
+  - Phys.Rev. C98 (2018) no.3, 034909 (https://inspirehep.net/record/1636208)
+  - Phys.Rev. C101 (2020) no.5, 054905 (https://inspirehep.net/literature/1782970)
 # Any commented line is skipped (i.e. no particles created or decayed). The
 # decay list should be mass ordered, and, of course all particles appearing
 # in decays should appear in the particles list.
@@ -50,32 +59,35 @@
 ===============================================================================
 # DESCRIPTION OF EXECUTION:
 # 1) Runing
-  run_fastreso_therminator.exe particles.data decays_without_weak.data ./
-#will first create derived class TFastReso_THERMINATOR from TFastReso, which is responsible for reading-in input
+  run_fastreso_azyhydro.exe decays_PDG2016Plus_massorder.dat ./
+#will first create derived class TFastReso_AZYHYDRO from TFastReso, which is responsible for reading-in input
 #files and performing the decay calculations.
 
 # 2) TFastReso object must be then invoked with read-in method
-  fastreso.read_particle_data("particles.data") 
-# The method reads the resonance list (see particles.data) and creates a list
-# of particles class TParticle_THERMINATOR (derived from TParticle), which will contain the irreducible components
-# and the printout proceedures.
+  fastreso.read_particle_data("decays_PDG2016Plus_massorder.dat", "Feq Fshear
+Fbulk Ftemp Fvel", true) 
+# The method reads the resonance list and creates a list
+# of particles class TParticle_AZYHYDRO (derived from TParticle), which will
+contain the irreducible components for Feq Fshear Fbulk Ftemp Fvel. One can
+compute only Feq to speed computations.
+# This class also contains the printout procedures.
+# Boolean variable controls if to print the information of particles being
+read-in.
 
 # 3) Then irreducible weight fj (or F_j) must be initialized, which depends on
 # the freeze-out parameters (e.g. temperature). 
-# A big change in thisversion of the code is that irreducible components are multiplpied factors of momentum to
-# make calculating integrals easier.
-# Additional functions can be
-# easily added in TFastReso_formulas.h). See note.pdf and the paper for
+# Irreducible components are multiplied factors of momentum to make calculating integrals easier.
+# Additional functions can be easily added in TFastReso_formulas.h). See note.pdf and the paper for
 # documentation.
 # 
 # Initialization is done by the method do_thermal (which also has optional parameters, e.g.
 # chemical potential. See TFastReso class
    fastreso.do_thermal(Tfo)
 # Then optionally the initial components can be printed out through
-  fastreso.getParticle("pi0139plu")->print("pi0139plu_thermal");
+  fastreso.getParticleByPDG(211)->print("PDGid_211_thermal_T0.1450");
 
 # 4) The actual decay procedure is calculated by (see TFastReso_formulas.h)
-  fastreso.do_decays("decays.data")
+  fastreso.do_decays("decays_PDG2016Plus_massorder.dat", true)
 # This methods reads sequentially the decay list and performs the decay
 # incrementing the irreducible components of the decay product. To include
 # all feed-down, decays should be done from the heaviest resonances. After a
@@ -83,14 +95,64 @@
 # If irreducible components are needed for a particular intermediate decay,
 # it can be printed out using print_buffer routines (buffer is cleaned after
 # each decay).
+# Boolean variable controls if to print the information  about the decays
+being read in
 
-# 5) Finally particles, whose final decay components, are needed should be specified
-# in run_fastreso_therminator.cpp  (e.g. pions, Kaons, protons) by their names in
-# particles.data. 
+# 5) Finally particles, whose final decay components have to be printed can be
+selected by PDGid
+  fastreso.getParticleByPDG(211)->print("PDGid_211_total_T0.1450");
+# in run_fastreso_azyhydro.cpp
+#
+# Header of the output (if all 12 components are computed)
+# mc-number	             name	     mass	    width	deg	Qb	Qs	Qc	Qbot	isospin	charge	decays	   Nyield
+#       211	          Pion(+)	  0.13957	0.00000e+00	1	0	  0	0	1	1	  1	  1	0.00027924
+# 1:pbar [GeV]	2:m [GeV]	3:Feq 1	4:Feq 2	5:Fshear 1	6:Fshear 2	7:Fshear 3	8:Fbulk 1	9:Fbulk 2	10:Ftemp 1	11:Ftemp 2	12:Fvel 1	13:Fvel 2	14:Fvel 3
 
-# Analogous routine applies to other forms of import, e.g. AZYHYDRO. For custom imput files, it is easiest
+# Analogous routine applies to other forms of import, e.g. THERMINATOR. 
+# The header of the output is
+#      Name	     Mass	    Gamma	 Spin	Isospin	   I3	Nq	Ns	Naq	Nas	Nc	Nac	       MC	   Nyield
+# pi0139plu	 0.139570	0.00000e+00	  0.0	  1.0	  1.0	1	0	1	0	0	0	      211	0.00027924
+# 1:pbar [GeV]	2:m [GeV]	3:Feq 1	4:Feq 2	5:Fshear 1	6:Fshear 2	7:Fshear 3	8:Fbulk 1	9:Fbulk 2	10:Ftemp 1	11:Ftemp 2	12:Fvel 1	13:Fvel 2	14:Fvel 3
+
+# For custom input files, it is easiest
 # to create new derivative classes of TFastReso and TParticles. The decay procedure only needs
 # few of available information, e.g. masses and branching ratios, but in the future decay width could be used.
+
+===============================================================================
+===============================================================================
+# CALCULATION OF FREZEOUT KERNELS
+# FastReso does not compute the integral over the freeze-out surface. This
+# depends on particular event and should be implemented by the user. However a
+# common use case is boost-invariant and azimuthally symmetric freeze-out
+# surface. Then the eta and phi integrals can be done without the knowledge of
+# freeze-out contour in tau-r plane.
+# Class TKernel implements the computation of these integrals for equilibrium,
+# shear and bulk components. See the paper and the note.pdf for mode details.
+
+# To compute freeze-out kernels first run run_fastreso_azyhydro.exe for the
+# particles and temperatures of interest. Then do
+./run_kernels.exe ./inputfolder ./outputfolder/
+# This will calculate the kernels for pT and ur ranges given in grid_param.h
+# file for the default set of particles (pi, K, p, Xsi, Lambda, Omega). 
+# TKernel class use TParticle object as an input. Typically decayed particle
+components are re-initialized by the output of run_fastreso_azyhydro.exe .
+I.e., given the output file TParticle object can be read in. Note that
+currently this works only if all 12 components are output. In principle, one
+could do decays and kernel calculations in a single routine, without the need
+to output. Then one could speed up the procedure by only computing Feq
+components, for example.
+# TKernel class defines printout procedure which computes pT and ur grid of 
+# freeze-out kernels (not equally spaced).
+TParticle_AZYHYDRO("PDGid211_total_T0.145");
+TKernel kernel(&pion);
+kernel.print("PDGid211_total_T0.145", "Keq Kshear Kbulk")
+# produces kernels for all Keq Kshear and Kbulk components. Computations can
+be speed up by only using Keq.
+# For convenience a routine to output root files is given in
+run_kernels_root.cpp
+# where kernels are stored as 3D histograms.
+# Typically irreducible components and kernels are computed for a range of
+# temperatures. This should be specified by the user.
 
 ===============================================================================
 ===============================================================================
@@ -100,8 +162,10 @@
 # the main program file (add final printout calls here)
   run_fastreso_therminator.cpp
   run_fastreso_azyhydro.cpp
+  run_kernels.cpp
+  run_kernels_root.cpp
 # The main class files (add intermediate printout calls here, add additional
-# delta f's here)
+# components here)
   TFastReso.h
   TFastReso_formulas.h
   TFastReso_THERMINATOR.h .cpp
@@ -112,11 +176,20 @@
   TParticle.h
   TParticle_THERMINATOR.h .cpp
   TParticle_AZYHYDRO.h .cpp
+
+# Kernel computation class. Printout routines, velocity and momentum grid is defined
+# here.
+  TKernel.cpp
+  TKernel.h
 # Particle and decay data files 
-  decays.data
-  particles.data
-  pdg_weak.data
-  reverse_pdg_weak.data
+ ./resonance_lists/README
+ ./resonance_lists/particles.data
+ ./resonance_lists/decays_without_weak.data 
+ ./resonance_lists/decays.data 
+ ./resonance_lists/decays_PDG2005_massorder.dat
+ ./resonance_lists/decays_PDG2016_massorder.dat
+ ./resonance_lists/decays_PDG2016Plus_massorder.dat
+ ./resonance_lists/decays_QM2016Plus_massorder.dat
 # a table of Clebsch-Gordan coefficients to calculate the correct branching
 # ratio (needed for THERMINATOR type input)
   CGC.dat
@@ -153,7 +226,7 @@
 #
 ===============================================================================
 ===============================================================================
-# New (2019-07-23):
+#  (2019-07-23):
 # 1) Decays into massless particles, i.e. photon, is now supported through the change of variables
 # in integration variables. This only affects photon spectra, but is not well
 # tested. See notes.pdf
@@ -161,4 +234,16 @@
 # 3) Some checks on integration status was introduced, so that error handler could be turn-off if really needed.
 # 4) Old version of the code is saved on the branch 1809.11049
 
-
+===============================================================================
+===============================================================================
+# New (2021-01-01):
+# 1) Added new lists of resonance decays in resonance_lists folder. See README file
+# 2) Introduced possibility to only compute particular components, e.g. Feq.
+# 3) Added code to compute boost-invariant and azimuthally independent
+# freeze-out kernels. Possibility to compute Keq, Kshear and Kbulk components.
+# 4) For using FastReso with Partial Chemical Equilibrium (PCE) the user must
+# implement the computation of the appropriate chemical potentials and initialize TFastReso::do_thermal
+# routine with them. For PCE see, for example, P. Huovinen,  Eur.Phys.J.A37, 121  (2008),arXiv:0710.4379 [nucl-th] 
+# 5) TFastReso currently does not support resonance with finite-widths and
+# decays with 4 or more particles in the final state.
+# 6) Bulk components depends on speed of sound, which can be user specific.
